@@ -1,22 +1,24 @@
 ---
 name: grok-bot-control
-description: Coordinate directly with an authorized Grok Bot conversation, send verified handoffs, read back outcomes, prevent duplicate sends after UI timeouts, and track bounded follow-ups. Use when the user asks an agent to work with or control Grok Bot. This skill supplies workflow knowledge only; it does not grant UI, account, credential, API, or scheduler access.
+description: Coordinate with an authorized Grok Bot conversation through host UI tools or an optional pinned CLI adapter, read back handoffs, reconcile uncertain sends, and track bounded follow-ups. Use when the user asks an agent to work with or control Grok Bot. Installation does not grant account access or supply the external CLI or scheduler.
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # Grok Bot control
 
 Use the narrowest currently available surface. Start with the [host capability contract](references/host-adapters.md): identify the host, inspect its current tools, and verify the selected conversation from fresh state. A skill can describe a workflow but cannot grant tools. If the host exposes native computer control and the user selected the Mac Grok Bot app, follow [macOS CUA](references/macos-cua.md). If no supported surface exists, prepare a reviewable handoff and state the missing capability. Never invent a private endpoint or claim that this plugin includes an app, MCP server, login, or background service.
 
-The third-party `grok-bot-cli` is an optional experimental path. Read [CLI audit](references/cli-experimental.md) before proposing or using it. Its source review does not authorize installation, Keychain access, live API calls, or message sends.
+The third-party `grok-bot-cli` is an optional external backend. Read [CLI adapter](references/cli-adapter.md) and [CLI audit](references/cli-experimental.md) before use. The plugin includes only a thin subprocess adapter, never authentication or gateway code. Prefer it for the supported roster/read/send operations only after its pin and current target checks pass; retain UI for unsupported operations and independent verification. Installation, credentials, and sends must remain within the user's authorized scope.
+
+For tasks that may use both CLI and UI, use one private `delivery.sqlite3`, one task scope, and the exact target ID and message digest across both paths. Read the journal before any UI send, reserve before activating Send, and confirm only from fresh outgoing-message readback. CLI uncertainty blocks UI retry even if a matching draft remains. The legacy UI-only state helper without journal arguments remains advisory and does not protect a separate CLI process.
 
 ## Reliable coordination loop
 
 1. Read the current task record, the target conversation, and the latest substantive reply. Confirm the requested conversation, authorized work, output, constraints, and stop condition. Do not switch conversations based on position in the sidebar.
 2. Prepare only the next useful delta. Identify the current operator, exact files or artifact hashes, what changed, how to verify it, and which external actions remain outside scope. Use the operator name supplied by the current host; do not assume `codex`, `claude`, or `grok` from the skill package.
-3. Before sending, read the composer and target conversation. Preserve unrelated drafts. Paste the complete message with the current tool's documented text-paste method, then read it back.
-4. Send once. After any timeout or ambiguous result, inspect the conversation and composer before retrying. A new matching message plus an empty composer means sent. A matching draft means do not paste again. If neither state can be established, record `uncertain_send` and stop retries.
+3. Select one send path. For CLI, follow its pin, target, fresh baseline, and journal checks. For UI, read the composer and target conversation, preserve unrelated drafts, paste the complete message through the current tool's documented method, and read it back. Both paths reserve the shared journal before dispatch.
+4. Send once. A CLI acknowledgement alone is insufficient; reconcile against fresh outgoing readback. For UI, a new matching outgoing message relative to the pre-send view plus an empty composer supports delivery. A matching draft does not override an uncertain journal record. If delivery remains ambiguous, record uncertainty and stop retries on both paths.
 5. Treat an acknowledgement, a claimed PASS, artifact receipt, hash confirmation, deployment, and long-running health as separate evidence. Verify the actual files and fresh outputs required by the task.
 6. When waiting is authorized, follow [coordination and waiting](references/coordination.md). Nudge only after checking for new progress. Finish by recording the accepted result and disabling task-specific tracking.
 
@@ -25,6 +27,7 @@ For routine editing, file exchange, computer-target selection, and skill install
 ## Boundaries
 
 - Conversation-control authorization applies only to the user-selected conversation and task. It does not approve purchases, destructive changes, credential access, third-party messages, deployments, or other proposed actions.
+- Reuse existing authorization for the same delegated task and target; do not ask again for routine progress reads, handoffs, or already-authorized follow-ups. Ask only when the next action lacks that scope or requires a new decision.
 - Never store access tokens, login descriptors, Keychain values, raw private chats, account identifiers, one-time codes, host identifiers, or user-specific absolute paths in this plugin or ordinary handoff bundles.
 - A tool error is not evidence that an action failed. A status label is not evidence that it succeeded. Read back the visible or file state.
 - Keep one active sender for a coordination thread. State files document ownership but do not implement distributed locking.
@@ -38,7 +41,7 @@ Copy [coordination-state.json](assets/coordination-state.json) into a stable tas
 python3 scripts/assess_wait.py /path/to/coordination.json
 ```
 
-`nudge_due` is timing advice only. Before pasting or sending the nudge, hash its exact text and run it through the same `assess_send.py` UI-readback gate below.
+`nudge_due` is timing advice only. Hash its exact text and use the selected path's send gate and shared journal: the CLI adapter, or the `assess_send.py` UI-readback gate below.
 
 It returns timing advice only. It never opens Grok Bot, sends a message, edits state, or creates a schedule.
 

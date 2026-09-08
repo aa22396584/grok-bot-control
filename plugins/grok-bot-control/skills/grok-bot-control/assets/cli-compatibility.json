@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "repository": "https://github.com/ImL1s/grok-bot-cli",
+  "source_commit": "60f571416aa9659b1a1b610001ac7384ab722b78",
+  "node_major_versions": [
+    22
+  ],
+  "app_bundle_id": "com.anysphere.sand",
+  "app_versions": [
+    "0.44.0"
+  ],
+  "live_platforms": [
+    "darwin"
+  ],
+  "operations": [
+    "bots",
+    "thread",
+    "send",
+    "reconcile"
+  ],
+  "files": {
+    "package.json": "f9cec70abb5e48dd2a95035fe21d0eab9aeb2df30c3b9cd9eb70bddf3a0639d6",
+    "src/app-session.js": "4cc4e0183c6594fd1cdae9a9e9f8bd06438d601206d57fc4e33ded7c806f6f26",
+    "src/cli.js": "646952ea585f969871e42873c4a133005887dcce4e3d5f3e8ef3b342e6d3aec0",
+    "src/commands.js": "a99f2732f557ed512f3ff4c2402ffdd660628a100c99c1f543265848b7b47e74",
+    "src/gateway.js": "6cc480126aedababd7dc86f8e96cec1c1230dee460b7b265ebfeb67cdf5d44f3",
+    "src/headers.js": "e229f2826ebdfb52949dab500798c0fa8a5ff7c4e63de91a63103bf45d2ae3cc",
+    "src/store.js": "746b30895978d4dffffb0b8ae8c871d7a948e7d112730d97fc464943d99d99d5",
+    "src/transcript.js": "561b4be0ff1d5e6d5cc938e5b1b8b2909ef7497b9cbf638e2c6c857418918c30"
+  }
+}

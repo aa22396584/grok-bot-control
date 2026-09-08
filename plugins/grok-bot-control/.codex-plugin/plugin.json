@@ -1,6 +1,6 @@
 {
   "name": "grok-bot-control",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Coordinate authorized Grok Bot conversations with portable skills, capability checks, and verified handoffs.",
   "author": {
     "name": "ImL1s",
@@ -18,7 +18,7 @@
   "interface": {
     "displayName": "Grok Bot Control",
     "shortDescription": "Reliable Grok Bot handoffs with readback and duplicate-send protection.",
-    "longDescription": "A shared skill for Codex, Claude Code, and Grok Build. Checks host capabilities, preserves drafts, reconciles uncertain sends, and reviews returned evidence. Computer-use tools and optional CLI access are supplied by the host.",
+    "longDescription": "A shared skill for Codex, Claude Code, and Grok Build. Checks host capabilities, preserves drafts, reconciles uncertain sends, and reviews returned evidence. Includes an optional source-pinned CLI adapter and a shared local delivery journal. UI tools and the separate CLI must be supplied by the host.",
     "developerName": "ImL1s",
     "category": "Productivity",
     "capabilities": [

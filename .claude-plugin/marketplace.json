@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "grok-bot-control",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "description": "Coordinate authorized Grok Bot conversations with portable skills, capability checks, and verified handoffs.",
       "source": "./plugins/grok-bot-control",
       "category": "productivity"

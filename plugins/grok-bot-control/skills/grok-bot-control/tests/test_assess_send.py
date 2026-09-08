@@ -14,6 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/assess_send.py"
+DELIVERY_SCRIPT = ROOT / "scripts/delivery_state.py"
 SPEC = importlib.util.spec_from_file_location("assess_send", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -177,6 +178,30 @@ class CliTests(unittest.TestCase):
             "--now", "2026-09-08T02:00:00Z",
         ]
 
+    def reserve_delivery(self, journal_path, transport="cli"):
+        result = subprocess.run(
+            [
+                sys.executable, str(DELIVERY_SCRIPT), "begin", str(journal_path),
+                "--scope", "task", "--target", "target",
+                "--message-sha256", DIGEST,
+                "--operator", "codex", "--transport", transport,
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(json.loads(result.stdout)["reserved"])
+
+    def journal_command(self, state_path, journal_path, observation="matching-draft-only"):
+        return [
+            sys.executable, str(SCRIPT), str(state_path),
+            "--operator", "codex", "--message-sha256", DIGEST,
+            "--observation", observation,
+            "--delivery-journal", str(journal_path),
+            "--delivery-scope", "task", "--delivery-target", "target",
+        ]
+
     def test_cli_is_read_only(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "state.json"
@@ -317,6 +342,52 @@ class CliTests(unittest.TestCase):
             self.assertEqual(result.returncode, 2)
             self.assertEqual(json.loads(result.stdout)["error"]["code"], "invalid_input")
             self.assertNotIn("Traceback", result.stderr)
+
+    def test_cli_uncertainty_blocks_matching_ui_draft_retry(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = Path(tmp) / "state.json"
+            journal_path = Path(tmp) / "journal.sqlite3"
+            state_path.write_text(json.dumps(state()), encoding="utf-8")
+            self.reserve_delivery(journal_path, transport="cli")
+            result = subprocess.run(
+                self.journal_command(state_path, journal_path),
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(result.stdout)["action"], "inspect")
+            self.assertEqual(
+                json.loads(result.stdout)["reason"],
+                "delivery_journal:matching_delivery",
+            )
+
+    def test_confirmed_journal_stops_legacy_send_resolution(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = Path(tmp) / "state.json"
+            journal_path = Path(tmp) / "journal.sqlite3"
+            state_path.write_text(json.dumps(state()), encoding="utf-8")
+            self.reserve_delivery(journal_path)
+            confirmed = subprocess.run(
+                [
+                    sys.executable, str(DELIVERY_SCRIPT), "confirm", str(journal_path),
+                    "--scope", "task", "--target", "target",
+                    "--message-sha256", DIGEST, "--transport", "ui",
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(confirmed.returncode, 0, confirmed.stderr)
+            result = subprocess.run(
+                self.journal_command(state_path, journal_path),
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(result.stdout)["action"], "stop")
+            self.assertEqual(json.loads(result.stdout)["reason"], "delivery_journal:confirmed")
 
 
 if __name__ == "__main__":

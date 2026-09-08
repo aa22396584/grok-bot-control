@@ -1,13 +1,13 @@
 # Contributing
 
-Contributions should preserve the plugin's narrow role: portable agent coordination guidance plus offline, read-only decision helpers.
+Contributions should preserve the plugin's narrow role: portable coordination guidance, offline decisions, and a thin optional adapter to a separately maintained CLI.
 
 ## Change requirements
 
 1. Keep credentials, identifiers, private transcripts, real Bot names, employee paths, and machine-specific absolute paths out of fixtures and documentation.
 2. Mark each workflow as exercised, offline-tested, documented-only, or unverified. Do not turn a product capability into a plugin claim.
 3. Add regression tests before changing send, timeout, operator, or duplicate-handling behavior.
-4. Keep helper scripts standard-library-only and side-effect-free. They may advise; they must not open apps, send messages, mutate state, or schedule work.
+4. Keep assessment helpers standard-library-only and side-effect-free. The explicit delivery journal may persist local reservations. Only `grok_cli.py` may invoke the pinned external CLI, with live/send opt-ins and a durable reservation before a send. Tests must use synthetic backends and must not invoke real accounts.
 5. For optional third-party CLI changes, pin the audited source, document credential access and undocumented-route dependence, and keep patches separate from this plugin.
 
 ## Validation
