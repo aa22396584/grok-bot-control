@@ -6,7 +6,6 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
-import sys
 from pathlib import Path
 from types import ModuleType
 from typing import Any

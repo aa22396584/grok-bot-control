@@ -12,7 +12,7 @@ from urllib.parse import unquote, urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 PLUGIN = ROOT / "plugins/grok-bot-control"
 SKILL = PLUGIN / "skills/grok-bot-control"
-SKIP = {".git", "__pycache__", "dist", ".venv"}
+SKIP = {".git", "__pycache__", "dist", ".venv", ".mypy_cache", ".ruff_cache", ".pytest_cache"}
 
 
 def source_files(root: Path):
