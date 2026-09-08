@@ -27,7 +27,8 @@ OTHER_DIGEST = "b" * 64
 
 class DeliveryJournalTests(unittest.TestCase):
     def test_relative_paths_are_refused_before_file_creation(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        # Windows runners can put the checkout and default temp on different drives.
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as tmp:
             absolute = Path(tmp) / "journal.sqlite3"
             relative = Path(os.path.relpath(absolute, Path.cwd()))
             calls = (
