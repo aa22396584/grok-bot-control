@@ -22,7 +22,7 @@ python3 scripts/build_release.py --output dist
 
 1. Open [OpenAI Platform plugins](https://platform.openai.com/plugins) in the intended publishing organization.
 2. Complete the required individual or business developer verification. A pending identity review is not approval.
-3. Choose **Create plugin → Skills only**. Upload the final tested skills bundle using the current portal's accepted upload layout; no MCP server belongs in this submission.
+3. Choose **Create plugin → Skills only**. Upload `grok-bot-control-0.2.0-plugin.zip`, the tested plugin-root bundle containing the manifest and skills. The portal accepted this layout on 2026-09-08; `skills.zip` is the separate portable Agent Skills distribution. No MCP server belongs in this submission. The portal may warn that `SKILL.md` metadata does not configure the interface; this package supplies those settings in `agents/openai.yaml`.
 4. Enter the prepared listing, logo, public policy/support URLs, starter prompts, and test cases. Match publisher information to the verified identity; never infer legal identity from a GitHub handle.
 5. Review availability, declarations, and any additional portal requirements. Submit only truthful claims about the current package and test environment.
 6. Submit for review, retain the receipt, and address reviewer feedback. Publish only after approval and the portal's publication step.
