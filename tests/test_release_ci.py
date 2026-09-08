@@ -57,6 +57,15 @@ class PrivateDataScanTests(unittest.TestCase):
     def test_repository_scan_passes(self) -> None:
         self.assertEqual(PRIVATE_SCAN.scan(ROOT), [])
 
+    def test_root_home_path_is_detected_and_redacted(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            private_path = "/" + "root/private-customer/config.json"
+            (root / "fixture.md").write_text(private_path, encoding="utf-8")
+            messages = "\n".join(finding.safe_message(root) for finding in PRIVATE_SCAN.scan(root))
+            self.assertIn("private root home path", messages)
+            self.assertNotIn(private_path, messages)
+
 
 class ArchiveTests(unittest.TestCase):
     def test_archive_name_is_posix(self) -> None:

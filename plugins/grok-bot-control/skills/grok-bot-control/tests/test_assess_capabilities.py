@@ -103,6 +103,15 @@ class DecisionTests(unittest.TestCase):
         payload["capabilities"]["activate_send"] = {"available": False, "evidence": "unknown"}
         self.assertEqual(self.decide(payload)["action"], "review_only")
 
+    def test_missing_send_tool_does_not_bypass_stale_read_evidence(self):
+        payload = snapshot()
+        payload["capabilities"]["activate_send"] = {"available": False, "evidence": "unknown"}
+        payload["capabilities"]["read_sent_state"]["evidence"] = "current_tool_docs"
+        result = self.decide(payload)
+        self.assertEqual(result["action"], "inspect")
+        self.assertEqual(result["reason"], "fresh_readback_missing")
+        self.assertEqual(result["capabilities"], ["read_sent_state"])
+
     def test_malformed_intent_object_is_structured_invalid_input(self):
         payload = snapshot(intent={"operator": "current-agent"})
         with self.assertRaises(MODULE.InputError):

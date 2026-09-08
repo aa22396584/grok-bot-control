@@ -40,6 +40,7 @@ CONTENT_RULES = (
     ("OpenAI API key", re.compile(rb"\bsk-(?:proj-)?[A-Za-z0-9_-]{30,}\b")),
     ("private macOS home path", re.compile(rb"/Users/(?!example\b|runner\b|USERNAME\b)[A-Za-z0-9._-]+/")),
     ("private Linux home path", re.compile(rb"/home/(?!example\b|runner\b|USERNAME\b)[A-Za-z0-9._-]+/")),
+    ("private root home path", re.compile(rb"/root/[A-Za-z0-9._-]+")),
     ("private Windows home path", re.compile(rb"[A-Za-z]:\\Users\\(?!example\\|runner\\|USERNAME\\)[^\\\s]+\\")),
 )
 

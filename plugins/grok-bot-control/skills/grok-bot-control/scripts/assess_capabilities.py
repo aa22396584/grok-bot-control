@@ -163,9 +163,35 @@ def decide(
     capabilities = snapshot["capabilities"]
     unavailable = sorted(name for name, value in capabilities.items() if not value["available"])
     if unavailable:
-        readable = all(capabilities[name]["available"] for name in READ_CAPABILITIES)
+        missing_reads = sorted(name for name in READ_CAPABILITIES if not capabilities[name]["available"])
+        if missing_reads:
+            return {
+                "action": "handoff_only",
+                "reason": "missing_capabilities",
+                "missing": unavailable,
+            }
+        unknown_reads = sorted(
+            name for name in READ_CAPABILITIES
+            if capabilities[name]["evidence"] == "unknown"
+        )
+        if unknown_reads:
+            return {
+                "action": "inspect",
+                "reason": "capability_evidence_missing",
+                "capabilities": unknown_reads,
+            }
+        stale_reads = sorted(
+            name for name in READ_CAPABILITIES
+            if capabilities[name]["evidence"] != "fresh_state_readback"
+        )
+        if stale_reads:
+            return {
+                "action": "inspect",
+                "reason": "fresh_readback_missing",
+                "capabilities": stale_reads,
+            }
         return {
-            "action": "review_only" if readable else "handoff_only",
+            "action": "review_only",
             "reason": "missing_capabilities",
             "missing": unavailable,
         }
