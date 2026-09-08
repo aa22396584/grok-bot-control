@@ -2,7 +2,7 @@
 name: grok-bot-control
 description: Coordinate directly with an authorized Grok Bot conversation, send verified handoffs, read back outcomes, prevent duplicate sends after UI timeouts, and track bounded follow-ups. Use when the user asks Codex to work with or control Grok Bot. This skill supplies workflow knowledge only; it does not grant UI, account, credential, API, or scheduler access.
 metadata:
-  version: "1.0.0"
+  version: "0.1.0"
 ---
 
 # Grok Bot control

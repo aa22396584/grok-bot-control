@@ -64,6 +64,7 @@ def validate():
         assert asset.resolve().is_relative_to(PLUGIN.resolve())
         assert asset.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
     assert re.search(r"(?m)^name: grok-bot-control$", (SKILL / "SKILL.md").read_text())
+    assert re.search(r'(?m)^  version: "' + re.escape(manifest["version"]) + r'"$', (SKILL / "SKILL.md").read_text())
     files = list(source_files(ROOT))
     for path in files:
         if path.suffix == ".py":
