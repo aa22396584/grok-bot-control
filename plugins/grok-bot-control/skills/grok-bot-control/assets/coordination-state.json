@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "task": "",
+  "operator": "",
+  "surface": null,
+  "conversation": null,
+  "phase": "drafting",
+  "scope": [],
+  "constraints": [],
+  "waiting_since": null,
+  "last_progress_at": null,
+  "announced_eta": null,
+  "last_nudge_at": null,
+  "nudges_since_progress": 0,
+  "stall_notice_sent": false,
+  "nudge_policy": {
+    "enabled": false,
+    "first_after_minutes": 20,
+    "repeat_after_minutes": 30,
+    "max_per_stall": 2
+  },
+  "last_sent": {
+    "at": null,
+    "message_sha256": null,
+    "ui_readback_confirmed": false,
+    "uncertain_send": false,
+    "bot_acknowledged": false
+  },
+  "expected_artifact": null,
+  "latest_review": null,
+  "next_action": ""
+}

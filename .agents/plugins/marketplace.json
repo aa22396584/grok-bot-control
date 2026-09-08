@@ -1,0 +1,20 @@
+{
+  "name": "grok-bot-control-local",
+  "interface": {
+    "displayName": "Grok Bot Control Local"
+  },
+  "plugins": [
+    {
+      "name": "grok-bot-control",
+      "source": {
+        "source": "local",
+        "path": "./plugins/grok-bot-control"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""Offline structure, source, asset and relative-link checks; no account access."""
+from __future__ import annotations
+
+import ast
+import json
+import re
+from html.parser import HTMLParser
+from pathlib import Path
+from urllib.parse import unquote, urlsplit
+
+ROOT = Path(__file__).resolve().parents[1]
+PLUGIN = ROOT / "plugins/grok-bot-control"
+SKILL = PLUGIN / "skills/grok-bot-control"
+SKIP = {".git", "__pycache__", "dist", ".venv"}
+
+
+def source_files(root: Path):
+    for path in sorted(root.rglob("*")):
+        if any(part in SKIP for part in path.relative_to(root).parts):
+            continue
+        if path.is_symlink():
+            raise ValueError(f"Symlink is not allowed: {path.relative_to(ROOT)}")
+        if path.is_file():
+            if path.name.startswith(".env") or ".session" in path.name or path.suffix in {".log", ".pyc", ".pyo"}:
+                raise ValueError(f"Runtime/private file is not allowed: {path.relative_to(ROOT)}")
+            yield path
+
+
+class Links(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.urls = []
+
+    def handle_starttag(self, tag, attrs):
+        self.urls.extend(value for key, value in attrs if key in {"href", "src"} and value)
+
+
+def check_link(source: Path, url: str):
+    parsed = urlsplit(url)
+    if parsed.scheme or parsed.netloc or not parsed.path:
+        return
+    target = (source.parent / unquote(parsed.path)).resolve()
+    if not target.is_relative_to(ROOT):
+        raise ValueError(f"Link escapes repository: {source.relative_to(ROOT)}: {url}")
+    if not target.exists():
+        raise ValueError(f"Broken local link: {source.relative_to(ROOT)}: {url}")
+
+
+def validate():
+    manifest = json.loads((PLUGIN / ".codex-plugin/plugin.json").read_text())
+    marketplace = json.loads((ROOT / ".agents/plugins/marketplace.json").read_text())
+    assert manifest["name"] == "grok-bot-control"
+    assert re.fullmatch(r"\d+\.\d+\.\d+", manifest["version"])
+    assert manifest["license"] == "MIT"
+    assert marketplace["name"] == "grok-bot-control-local"
+    assert len(marketplace["plugins"]) == 1
+    entry = marketplace["plugins"][0]
+    assert entry["name"] == manifest["name"]
+    assert entry["source"] == {"source": "local", "path": "./plugins/grok-bot-control"}
+    assert entry["policy"] == {"installation": "AVAILABLE", "authentication": "ON_INSTALL"}
+    for key in ("logo", "composerIcon"):
+        asset = PLUGIN / manifest["interface"][key]
+        assert asset.resolve().is_relative_to(PLUGIN.resolve())
+        assert asset.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+    assert re.search(r"(?m)^name: grok-bot-control$", (SKILL / "SKILL.md").read_text())
+    files = list(source_files(ROOT))
+    for path in files:
+        if path.suffix == ".py":
+            ast.parse(path.read_text(), filename=str(path.relative_to(ROOT)))
+        elif path.suffix == ".json":
+            json.loads(path.read_text())
+        elif path.suffix == ".html":
+            parser = Links()
+            parser.feed(path.read_text())
+            for url in parser.urls:
+                check_link(path, url)
+        elif path.suffix == ".md":
+            for url in re.findall(r"\]\(([^\s)]+)\)", path.read_text()):
+                check_link(path, url)
+    return {"status": "pass", "source_files": len(files), "version": manifest["version"], "network_used": False}
+
+
+if __name__ == "__main__":
+    print(json.dumps(validate(), indent=2))

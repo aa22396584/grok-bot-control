@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+dist/
+.venv/
+.env
+.env.*
+*.session
+*.session-*
+coordination.json
+*.log

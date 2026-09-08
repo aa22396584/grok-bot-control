@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "submission_type": "skills-only",
+  "official_reference": "https://developers.openai.com/plugins/deploy/submission#testing",
+  "proof_boundary": "These cases exercise deterministic offline advice only. They do not open Grok Bot, authenticate, send messages, or prove live UI delivery.",
+  "cases": [
+    {
+      "id": "positive-draft-paste-advice",
+      "type": "positive",
+      "user_prompt": "Prepare this reviewed handoff in my authorized Grok Bot conversation and avoid duplicate sends.",
+      "expected_workflow": "Confirm the recorded operator and target, hash the exact message, observe that it is absent, and advise one paste before any send.",
+      "expected_result_shape": {"action": "string", "reason": "string"},
+      "fixture_ref": "draft_ready",
+      "invocation": {
+        "helper": "assess_send",
+        "operator": "codex",
+        "message_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "observation": "absent"
+      },
+      "expected_exact_result": {"action": "paste_once", "reason": "message_absent_in_drafting"}
+    },
+    {
+      "id": "positive-visible-message-reconcile",
+      "type": "positive",
+      "user_prompt": "The send action timed out. Check whether the exact handoff is already visible before doing anything else.",
+      "expected_workflow": "Use the message digest and a fresh matching-sent observation to mark the send as visible without retrying it.",
+      "expected_result_shape": {"action": "string", "reason": "string"},
+      "fixture_ref": "visible_matching_message",
+      "invocation": {
+        "helper": "assess_send",
+        "operator": "codex",
+        "message_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "observation": "matching-sent"
+      },
+      "expected_exact_result": {"action": "mark_sent", "reason": "matching_message_visible"}
+    },
+    {
+      "id": "positive-progress-delays-nudge",
+      "type": "positive",
+      "user_prompt": "Grok posted progress five minutes ago. Decide whether a follow-up is due under the 20-minute policy.",
+      "expected_workflow": "Anchor the delay to the latest progress, keep waiting, and return the next deterministic check time.",
+      "expected_result_shape": {"action": "string", "reason": "string", "next_check_at": "ISO-8601 UTC string"},
+      "fixture_ref": "waiting_with_recent_progress",
+      "invocation": {"helper": "assess_wait", "now": "2026-09-08T02:00:00+08:00"},
+      "expected_exact_result": {
+        "action": "wait",
+        "reason": "waiting_interval_or_eta",
+        "next_check_at": "2026-09-07T18:15:00Z"
+      }
+    },
+    {
+      "id": "positive-bounded-nudge-due",
+      "type": "positive",
+      "user_prompt": "There has been no progress for 30 minutes. Check whether one bounded nudge is due.",
+      "expected_workflow": "Apply the configured first-delay and cap, then advise a nudge because the due time has passed and no nudge was recorded.",
+      "expected_result_shape": {"action": "string", "reason": "string"},
+      "fixture_ref": "waiting_past_first_nudge",
+      "invocation": {"helper": "assess_wait", "now": "2026-09-08T02:00:00+08:00"},
+      "expected_exact_result": {"action": "nudge_due", "reason": "bot_stalled_past_due"}
+    },
+    {
+      "id": "positive-completed-task-stops",
+      "type": "positive",
+      "user_prompt": "The coordination task is complete. Decide whether the same message should be sent again.",
+      "expected_workflow": "Recognize the terminal phase and stop the send path.",
+      "expected_result_shape": {"action": "string", "reason": "string"},
+      "fixture_ref": "completed_task",
+      "invocation": {
+        "helper": "assess_send",
+        "operator": "codex",
+        "message_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "observation": "matching-draft-only"
+      },
+      "expected_exact_result": {"action": "stop", "reason": "phase_complete"}
+    },
+    {
+      "id": "negative-wrong-operator",
+      "type": "negative",
+      "user_prompt": "Send the draft even though another operator owns this conversation record.",
+      "expected_workflow": "Refuse this sender and stop because the recorded single-writer owner differs.",
+      "expected_result_shape": {"action": "string", "reason": "string"},
+      "fixture_ref": "owned_by_other_operator",
+      "invocation": {
+        "helper": "assess_send",
+        "operator": "codex",
+        "message_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "observation": "matching-draft-only"
+      },
+      "expected_exact_result": {"action": "stop", "reason": "different_operator"},
+      "negative_why": "A second writer could duplicate or conflict with the recorded operator's send."
+    },
+    {
+      "id": "negative-different-uncertain-send",
+      "type": "negative",
+      "user_prompt": "Send this new message while a different prior message still has an uncertain send result.",
+      "expected_workflow": "Require reconciliation of the earlier uncertain digest instead of authorizing a new send.",
+      "expected_result_shape": {"action": "string", "reason": "string"},
+      "fixture_ref": "different_uncertain_send",
+      "invocation": {
+        "helper": "assess_send",
+        "operator": "codex",
+        "message_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "observation": "matching-draft-only"
+      },
+      "expected_exact_result": {"action": "inspect", "reason": "different_uncertain_send_unresolved"},
+      "negative_why": "Sending before reconciling the earlier outcome could duplicate or reorder messages."
+    },
+    {
+      "id": "negative-already-acknowledged",
+      "type": "negative",
+      "user_prompt": "Resend the same handoff even though the Bot already acknowledged it.",
+      "expected_workflow": "Stop because acknowledgement for the same digest is evidence that the message was already sent.",
+      "expected_result_shape": {"action": "string", "reason": "string"},
+      "fixture_ref": "already_acknowledged",
+      "invocation": {
+        "helper": "assess_send",
+        "operator": "codex",
+        "message_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "observation": "matching-draft-only"
+      },
+      "expected_exact_result": {"action": "stop", "reason": "message_already_confirmed_sent"},
+      "negative_why": "The requested resend would create a duplicate in the external conversation."
+    },
+    {
+      "id": "negative-blank-target",
+      "type": "negative",
+      "user_prompt": "Send the handoff without a recorded target conversation.",
+      "expected_workflow": "Require target inspection and avoid paste or send advice until the target is set.",
+      "expected_result_shape": {"action": "string", "reason": "string"},
+      "fixture_ref": "blank_conversation",
+      "invocation": {
+        "helper": "assess_send",
+        "operator": "codex",
+        "message_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "observation": "matching-draft-only"
+      },
+      "expected_exact_result": {"action": "inspect", "reason": "conversation_unset"},
+      "negative_why": "Without an exact target, the plugin cannot establish where the external message would go."
+    }
+  ]
+}

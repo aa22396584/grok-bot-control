@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "fixtures": {
+    "draft_ready": {
+      "schema_version": 1,
+      "phase": "drafting",
+      "operator": "codex",
+      "conversation": "review-conversation",
+      "last_sent": {
+        "message_sha256": null,
+        "ui_readback_confirmed": false,
+        "uncertain_send": false,
+        "bot_acknowledged": false
+      }
+    },
+    "visible_matching_message": {
+      "schema_version": 1,
+      "phase": "waiting_bot",
+      "operator": "codex",
+      "conversation": "review-conversation",
+      "last_sent": {
+        "message_sha256": null,
+        "ui_readback_confirmed": false,
+        "uncertain_send": false,
+        "bot_acknowledged": false
+      }
+    },
+    "waiting_with_recent_progress": {
+      "schema_version": 1,
+      "phase": "waiting_bot",
+      "operator": "codex",
+      "conversation": "review-conversation",
+      "waiting_since": "2026-09-08T01:30:00+08:00",
+      "last_progress_at": "2026-09-08T01:55:00+08:00",
+      "last_nudge_at": null,
+      "announced_eta": null,
+      "nudges_since_progress": 0,
+      "stall_notice_sent": false,
+      "last_sent": {
+        "uncertain_send": false
+      },
+      "nudge_policy": {
+        "enabled": true,
+        "first_after_minutes": 20,
+        "repeat_after_minutes": 30,
+        "max_per_stall": 2
+      }
+    },
+    "waiting_past_first_nudge": {
+      "schema_version": 1,
+      "phase": "waiting_bot",
+      "operator": "codex",
+      "conversation": "review-conversation",
+      "waiting_since": "2026-09-08T01:30:00+08:00",
+      "last_progress_at": "2026-09-08T01:30:00+08:00",
+      "last_nudge_at": null,
+      "announced_eta": null,
+      "nudges_since_progress": 0,
+      "stall_notice_sent": false,
+      "last_sent": {
+        "uncertain_send": false
+      },
+      "nudge_policy": {
+        "enabled": true,
+        "first_after_minutes": 20,
+        "repeat_after_minutes": 30,
+        "max_per_stall": 2
+      }
+    },
+    "completed_task": {
+      "schema_version": 1,
+      "phase": "complete",
+      "operator": "codex",
+      "conversation": "review-conversation",
+      "last_sent": {
+        "message_sha256": null,
+        "ui_readback_confirmed": false,
+        "uncertain_send": false,
+        "bot_acknowledged": false
+      }
+    },
+    "owned_by_other_operator": {
+      "schema_version": 1,
+      "phase": "drafting",
+      "operator": "claude",
+      "conversation": "review-conversation",
+      "last_sent": {
+        "message_sha256": null,
+        "ui_readback_confirmed": false,
+        "uncertain_send": false,
+        "bot_acknowledged": false
+      }
+    },
+    "different_uncertain_send": {
+      "schema_version": 1,
+      "phase": "waiting_bot",
+      "operator": "codex",
+      "conversation": "review-conversation",
+      "last_sent": {
+        "message_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "ui_readback_confirmed": false,
+        "uncertain_send": true,
+        "bot_acknowledged": false
+      }
+    },
+    "already_acknowledged": {
+      "schema_version": 1,
+      "phase": "waiting_bot",
+      "operator": "codex",
+      "conversation": "review-conversation",
+      "last_sent": {
+        "message_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "ui_readback_confirmed": false,
+        "uncertain_send": false,
+        "bot_acknowledged": true
+      }
+    },
+    "blank_conversation": {
+      "schema_version": 1,
+      "phase": "drafting",
+      "operator": "codex",
+      "conversation": "   ",
+      "last_sent": {
+        "message_sha256": null,
+        "ui_readback_confirmed": false,
+        "uncertain_send": false,
+        "bot_acknowledged": false
+      }
+    }
+  }
+}

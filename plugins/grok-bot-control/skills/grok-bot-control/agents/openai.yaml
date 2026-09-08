@@ -1,0 +1,4 @@
+interface:
+  display_name: "Grok Bot Control"
+  short_description: "Coordinate with Grok Bot using verified readback and handoff rules"
+  default_prompt: "Use $grok-bot-control to coordinate this authorized task with Grok Bot and verify the result."

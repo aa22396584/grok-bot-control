@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "submission_type": "skills-only",
+  "plugin_name": "Grok Bot Control",
+  "publisher": {
+    "public_handle": "ImL1s",
+    "platform_identity_status": "unknown",
+    "note": "Select the verified individual or business identity in the OpenAI Platform submission form; do not infer it from the GitHub handle."
+  },
+  "short_description": "Coordinate authorized Grok Bot conversations with send-once checks, evidence handoffs, and bounded follow-ups.",
+  "long_description": "Grok Bot Control is a skills-only workflow plugin for reliable coordination with an authorized Grok Bot conversation. It guides exact target verification, preserves unrelated drafts, reconciles uncertain sends before retrying, exchanges versioned evidence, and applies bounded progress nudges. Included Python helpers provide deterministic, read-only advice from synthetic or user-maintained coordination state. The plugin does not include Grok Bot, credentials, an MCP server, a computer-use backend, a scheduler, or a background service.",
+  "category": "Productivity",
+  "logo": {
+    "status": "prepared",
+    "path": "plugins/grok-bot-control/assets/logo.png",
+    "dimensions": "512x512",
+    "format": "PNG"
+  },
+  "urls": {
+    "website": "https://iml1s.github.io/grok-bot-control/",
+    "support": "https://iml1s.github.io/grok-bot-control/support/",
+    "privacy": "https://iml1s.github.io/grok-bot-control/privacy/",
+    "terms": "https://iml1s.github.io/grok-bot-control/terms/"
+  },
+  "starter_prompts": [
+    "Use Grok Bot Control to send this reviewed handoff to my authorized Bot and verify it appears once.",
+    "A send timed out. Inspect the conversation and composer before deciding whether any retry is safe.",
+    "Review the latest Bot reply and returned evidence, then check whether a follow-up is due."
+  ],
+  "test_materials": {
+    "catalog": "submission/test_cases.json",
+    "fixtures": "submission/fixture_states.json",
+    "instructions": "submission/TEST_CASES.md",
+    "runner": "scripts/run_review_cases.py",
+    "positive_count": 5,
+    "negative_count": 4
+  },
+  "availability": {
+    "status": "pending publisher decision",
+    "countries_or_regions": []
+  },
+  "release_notes": "Initial skills-only submission. Adds a documented single-writer coordination workflow, duplicate-send reconciliation, evidence-based handoffs, bounded nudge guidance, two read-only offline helpers, and reviewer-runnable synthetic cases. Live use requires a host-provided computer-use surface and the reviewer's already signed-in Grok Bot account; neither is bundled.",
+  "policy_attestations": {
+    "status": "not completed",
+    "note": "The publisher must review and complete attestations in the portal after verifying the final listing, URLs, identity, package, tests, and availability."
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "grok-bot-control",
+  "version": "0.1.0",
+  "description": "Safely coordinate with Grok Bot through a verified UI surface and review experimental CLI options.",
+  "author": {
+    "name": "ImL1s",
+    "url": "https://github.com/ImL1s"
+  },
+  "license": "MIT",
+  "keywords": [
+    "grok-bot",
+    "coordination",
+    "computer-use",
+    "handoff",
+    "duplicate-send"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Grok Bot Control",
+    "shortDescription": "Reliable Grok Bot handoffs with readback and duplicate-send protection.",
+    "longDescription": "Provides a reusable coordination workflow for an already-authorized Grok Bot conversation. It documents verified macOS CUA controls, evidence-based handoffs, waiting rules, and the limits of the experimental grok-bot-cli path.",
+    "developerName": "ImL1s",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Coordination"
+    ],
+    "defaultPrompt": [
+      "Use $grok-bot-control to coordinate this task with my authorized Grok Bot conversation.",
+      "Review the latest Grok Bot reply and verify its artifacts before continuing.",
+      "Check whether Grok Bot is stalled and prepare one safe follow-up if due."
+    ],
+    "websiteURL": "https://iml1s.github.io/grok-bot-control/",
+    "privacyPolicyURL": "https://iml1s.github.io/grok-bot-control/privacy/",
+    "termsOfServiceURL": "https://iml1s.github.io/grok-bot-control/terms/",
+    "brandColor": "#E7AC62",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/logo.png"
+  },
+  "homepage": "https://iml1s.github.io/grok-bot-control/",
+  "repository": "https://github.com/ImL1s/grok-bot-control"
+}

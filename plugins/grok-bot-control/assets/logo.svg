@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Grok Bot Control</title>
+  <desc id="desc">Two conversation panels connected by a checked handoff path</desc>
+  <rect width="128" height="128" rx="28" fill="#111816"/>
+  <path d="M25 31h52a10 10 0 0 1 10 10v23a10 10 0 0 1-10 10H48L33 86V74h-8a10 10 0 0 1-10-10V41a10 10 0 0 1 10-10Z" fill="#f4b860"/>
+  <path d="M55 54h46a12 12 0 0 1 12 12v21a12 12 0 0 1-12 12H77l-13 10V99h-9a12 12 0 0 1-12-12V66a12 12 0 0 1 12-12Z" fill="#48c5b5" stroke="#111816" stroke-width="6"/>
+  <path d="m65 77 8 8 17-18" fill="none" stroke="#111816" stroke-linecap="round" stroke-linejoin="round" stroke-width="7"/>
+</svg>
