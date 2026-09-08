@@ -1,6 +1,6 @@
 # Contributing
 
-Contributions should preserve the plugin's narrow role: Codex-hosted coordination guidance plus offline, read-only decision helpers.
+Contributions should preserve the plugin's narrow role: portable agent coordination guidance plus offline, read-only decision helpers.
 
 ## Change requirements
 
@@ -16,12 +16,15 @@ Run from the repository root:
 
 ```sh
 python3 -m unittest discover -s plugins/grok-bot-control/skills/grok-bot-control/tests -v
+python3 -m unittest discover -s tests -v
+python3 scripts/sync_metadata.py --check
+python3 scripts/check_private_data.py
 python3 scripts/run_review_cases.py
 python3 scripts/validate_release.py
 python3 scripts/build_release.py --output dist
 ```
 
-Then run the Codex skill and plugin validators used by your installation, scan for secrets and private paths, verify Markdown links, and inspect the final archive members. A live UI or CLI test requires a separate authorized test conversation and must use an announced synthetic marker.
+Then run the native validators for the hosts available in your environment, verify Markdown links, and inspect the final archive members. See [compatibility evidence](docs/COMPATIBILITY.md). A live UI or CLI test requires a separate authorized test conversation and must use an announced synthetic marker.
 
 ## Pull requests
 

@@ -1,0 +1,20 @@
+{
+  "name": "grok-bot-control",
+  "version": "0.2.0",
+  "description": "Coordinate authorized Grok Bot conversations with portable skills, capability checks, and verified handoffs.",
+  "author": {
+    "name": "ImL1s",
+    "url": "https://github.com/ImL1s"
+  },
+  "homepage": "https://iml1s.github.io/grok-bot-control/",
+  "repository": "https://github.com/ImL1s/grok-bot-control",
+  "license": "MIT",
+  "keywords": [
+    "grok-bot",
+    "coordination",
+    "computer-use",
+    "handoff",
+    "duplicate-send"
+  ],
+  "skills": "./skills/"
+}

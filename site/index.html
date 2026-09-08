@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A community Codex workflow plugin for controlled, reviewable Grok Bot coordination.">
+  <meta name="description" content="A shared Agent Skill for Codex, Claude Code, and Grok Build with reviewable Grok Bot handoffs.">
   <meta name="theme-color" content="#111816">
   <meta property="og:title" content="Grok Bot Control">
   <meta property="og:description" content="Controlled handoffs. Reviewable evidence. No hidden backend.">
@@ -25,7 +25,7 @@
       <div class="hero-copy">
         <div class="eyebrow">Community workflow plugin · MIT</div>
         <h1>Handoffs with a <em>paper trail.</em></h1>
-        <p class="lede">A Codex workflow plugin for coordinating work with Grok Bot through explicit ownership, bounded waits, evidence packages, and offline decision helpers.</p>
+        <p class="lede">A shared skill for Codex, Claude Code, and Grok Build to coordinate work with Grok Bot through explicit ownership, bounded waits, evidence packages, and offline decision helpers.</p>
         <p class="zh" lang="zh-Hant">把 Grok Bot 的交接、等待、催辦與驗收變成可檢查的流程。它協助你控制操作，不假裝自己是全天候自動化平台。</p>
         <div class="actions"><a class="button primary" href="#install">Install locally</a><a class="button" href="https://github.com/ImL1s/grok-bot-control">Read the source ↗</a></div>
       </div>
@@ -51,19 +51,27 @@
     </div></section>
 
     <section class="install" id="install"><div class="wrap section-grid">
-      <div><div class="eyebrow">Local install</div><h2>Two commands. Review the source first.</h2><p>Add the repository as a local Codex marketplace, then install the plugin from that marketplace.</p><p class="fineprint">Requirements: a Codex environment with plugin support and, for live operations, host-provided computer-use tools plus your own signed-in Grok Bot session.</p><p>After installing, open a new Codex task and ask: <strong>Use $grok-bot-control to coordinate with my authorized Grok Bot conversation.</strong></p></div>
+      <div><div class="eyebrow">Local install</div><h2>One skill. Your choice of agent.</h2><p>Add this community marketplace in your agent. Each platform loads the same skill and offline helpers.</p><p class="fineprint">Requirements: a compatible agent with plugin support and, for live operations, host-provided UI/browser tools or a separately configured CLI plus your own signed-in Grok Bot session.</p><p>After installing, open a new Codex task and ask: <strong>Use $grok-bot-control to coordinate with my authorized Grok Bot conversation.</strong></p></div>
       <div class="codebox"><code><span class="comment"># Add the community marketplace</span>
 codex plugin marketplace add ImL1s/grok-bot-control
 
 <span class="comment"># Install the workflow plugin</span>
-codex plugin add grok-bot-control@grok-bot-control-local</code></div>
+codex plugin add grok-bot-control@grok-bot-control-local
+
+<span class="comment"># Claude Code</span>
+claude plugin marketplace add ImL1s/grok-bot-control
+claude plugin install grok-bot-control@grok-bot-control-local
+
+<span class="comment"># Grok Build</span>
+grok plugin marketplace add ImL1s/grok-bot-control
+grok plugin install grok-bot-control --trust</code></div>
     </div></section>
 
     <section id="boundaries"><div class="wrap">
       <div class="eyebrow">Honest boundaries</div><h2>Know what you are installing.</h2>
       <div class="limits">
         <article class="limit"><div class="mark">×</div><h3>No bundled automation backend</h3><p>This project does not include a Grok Bot API client, authentication system, daemon, or hosted service.</p></article>
-        <article class="limit"><div class="mark">×</div><h3>No reliability promise</h3><p>It does not promise 24-hour uptime, cross-platform parity, exactly-once delivery, or unattended failover.</p></article>
+        <article class="limit"><div class="mark">×</div><h3>No reliability promise</h3><p>It does not promise 24-hour uptime, live UI parity across agents, exactly-once delivery, or unattended failover.</p></article>
         <article class="limit"><div class="mark">→</div><h3>Optional CLI is separate</h3><p>A community CLI fork is maintained independently at ImL1s/grok-bot-cli. Review it as a separate component.</p></article>
       </div>
     </div></section>

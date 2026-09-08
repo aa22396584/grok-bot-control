@@ -2,6 +2,7 @@
 """Offline structure, source, asset and relative-link checks; no account access."""
 from __future__ import annotations
 
+import argparse
 import ast
 import json
 import re
@@ -13,6 +14,12 @@ ROOT = Path(__file__).resolve().parents[1]
 PLUGIN = ROOT / "plugins/grok-bot-control"
 SKILL = PLUGIN / "skills/grok-bot-control"
 SKIP = {".git", "__pycache__", "dist", ".venv", ".mypy_cache", ".ruff_cache", ".pytest_cache"}
+
+
+def require(condition: object, message: str) -> None:
+    """Raise a fail-closed validation error even under Python optimized mode."""
+    if not condition:
+        raise ValueError(message)
 
 
 def source_files(root: Path):
@@ -47,40 +54,71 @@ def check_link(source: Path, url: str):
         raise ValueError(f"Broken local link: {source.relative_to(ROOT)}: {url}")
 
 
-def validate():
-    manifest = json.loads((PLUGIN / ".codex-plugin/plugin.json").read_text())
-    marketplace = json.loads((ROOT / ".agents/plugins/marketplace.json").read_text())
-    assert manifest["name"] == "grok-bot-control"
-    assert re.fullmatch(r"\d+\.\d+\.\d+", manifest["version"])
-    assert manifest["license"] == "MIT"
-    assert marketplace["name"] == "grok-bot-control-local"
-    assert len(marketplace["plugins"]) == 1
+def validate(expected_version: str | None = None):
+    release = json.loads((ROOT / "release.json").read_text(encoding="utf-8"))
+    manifest = json.loads((PLUGIN / ".codex-plugin/plugin.json").read_text(encoding="utf-8"))
+    marketplace = json.loads((ROOT / ".agents/plugins/marketplace.json").read_text(encoding="utf-8"))
+    require(manifest.get("name") == "grok-bot-control", "Unexpected plugin name")
+    require(
+        isinstance(manifest.get("version"), str)
+        and re.fullmatch(r"\d+\.\d+\.\d+", manifest["version"]),
+        "Plugin version must use semantic version form",
+    )
+    require(release.get("name") == manifest["name"], "Release and plugin names differ")
+    require(release.get("version") == manifest["version"], "Release and plugin versions differ")
+    if expected_version is not None:
+        require(re.fullmatch(r"\d+\.\d+\.\d+", expected_version), "Expected version must use semantic version form")
+        require(manifest["version"] == expected_version, "Expected version does not match release metadata")
+    require(manifest.get("license") == "MIT", "Unexpected plugin license")
+    require(marketplace.get("name") == "grok-bot-control-local", "Unexpected Codex marketplace name")
+    require(
+        isinstance(marketplace.get("plugins"), list) and len(marketplace["plugins"]) == 1,
+        "Codex marketplace must contain exactly one plugin",
+    )
     entry = marketplace["plugins"][0]
-    assert entry["name"] == manifest["name"]
-    assert entry["source"] == {"source": "local", "path": "./plugins/grok-bot-control"}
-    assert entry["policy"] == {"installation": "AVAILABLE", "authentication": "ON_INSTALL"}
+    require(entry.get("name") == manifest["name"], "Marketplace plugin name differs")
+    require(
+        entry.get("source") == {"source": "local", "path": "./plugins/grok-bot-control"},
+        "Unexpected Codex marketplace source",
+    )
+    require(
+        entry.get("policy") == {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+        "Unexpected Codex marketplace policy",
+    )
     for key in ("logo", "composerIcon"):
         asset = PLUGIN / manifest["interface"][key]
-        assert asset.resolve().is_relative_to(PLUGIN.resolve())
-        assert asset.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
-    assert re.search(r"(?m)^name: grok-bot-control$", (SKILL / "SKILL.md").read_text())
-    assert re.search(r'(?m)^  version: "' + re.escape(manifest["version"]) + r'"$', (SKILL / "SKILL.md").read_text())
+        require(asset.resolve().is_relative_to(PLUGIN.resolve()), f"{key} escapes plugin root")
+        require(asset.is_file(), f"{key} asset is missing")
+        require(asset.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"), f"{key} is not a PNG")
+    skill_text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+    require(re.search(r"(?m)^name: grok-bot-control$", skill_text), "Skill name is missing or invalid")
+    require(
+        re.search(r'(?m)^  version: "' + re.escape(manifest["version"]) + r'"$', skill_text),
+        "Skill version differs from release metadata",
+    )
     files = list(source_files(ROOT))
     for path in files:
         if path.suffix == ".py":
-            ast.parse(path.read_text(), filename=str(path.relative_to(ROOT)))
+            ast.parse(path.read_text(encoding="utf-8"), filename=str(path.relative_to(ROOT)))
         elif path.suffix == ".json":
-            json.loads(path.read_text())
+            json.loads(path.read_text(encoding="utf-8"))
         elif path.suffix == ".html":
             parser = Links()
-            parser.feed(path.read_text())
+            parser.feed(path.read_text(encoding="utf-8"))
             for url in parser.urls:
                 check_link(path, url)
         elif path.suffix == ".md":
-            for url in re.findall(r"\]\(([^\s)]+)\)", path.read_text()):
+            for url in re.findall(r"\]\(([^\s)]+)\)", path.read_text(encoding="utf-8")):
                 check_link(path, url)
     return {"status": "pass", "source_files": len(files), "version": manifest["version"], "network_used": False}
 
 
 if __name__ == "__main__":
-    print(json.dumps(validate(), indent=2))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--expected-version")
+    arguments = parser.parse_args()
+    try:
+        result = validate(arguments.expected_version)
+    except (KeyError, OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        parser.exit(1, f"Release validation failed: {exc}\n")
+    print(json.dumps(result, indent=2))

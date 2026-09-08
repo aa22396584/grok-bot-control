@@ -1,6 +1,6 @@
 # Grok Bot Control
 
-A Codex workflow plugin for reliable, reviewable coordination with a Grok Bot conversation. It captures a macOS computer-use procedure exercised in practice: identify the exact conversation, preserve unrelated drafts, read back pasted text, send once, and reconcile timeouts before retrying.
+A portable Agent Skills workflow for reliable, reviewable coordination with a Grok Bot conversation. It captures a macOS computer-use procedure exercised in practice and supplies the same core rules to Codex, Claude Code, Grok Build, and compatible skill hosts: identify the exact conversation, preserve unrelated drafts, read back pasted text, send once, and reconcile timeouts before retrying.
 
 This plugin contains instructions and offline state helpers. It does not bundle Grok Bot, a computer-use driver, an MCP server, account credentials, or an unofficial API client.
 
@@ -8,7 +8,7 @@ This plugin contains instructions and offline state helpers. It does not bundle 
 
 | Plugin capability | Requirement | Evidence level |
 | --- | --- | --- |
-| Operate a native Grok Bot conversation | Host-provided CUA tool, signed-in macOS app, user authorization | Exercised on macOS; UI may change |
+| Operate a native Grok Bot conversation | Host-provided CUA or equivalent tool, signed-in app, user authorization | Exercised on macOS; other hosts require their own evidence |
 | Prevent duplicate sends after UI timeouts | Fresh UI readback plus coordination state | Exercised workflow; offline decision tests included |
 | Exchange versioned files and verify returned artifacts | A transfer path available to both operators | Workflow documented; transport is host-specific |
 | Track progress and bounded nudges | Stable state file; optional host scheduler | Offline helper tested; scheduler is not included |
@@ -18,7 +18,7 @@ This plugin contains instructions and offline state helpers. It does not bundle 
 
 ## Grok Bot product capabilities versus this plugin
 
-Grok Bot itself supports direct Bot chats, multi-Bot groups, mentions and asynchronous Bot handoffs, attachments, shared cloud-computer state, skills, routines, and notifications. This plugin coordinates some of those features through tools already available to Codex; it does not reimplement or grant them.
+Grok Bot itself supports direct Bot chats, multi-Bot groups, mentions and asynchronous Bot handoffs, attachments, shared cloud-computer state, skills, routines, and notifications. This plugin coordinates some of those features through tools already available to the current host; it does not reimplement or grant them.
 
 | Grok Bot feature | What this plugin contributes |
 | --- | --- |
@@ -33,7 +33,7 @@ Current official references: [work](https://cursor.com/docs/grok-bot/work), [set
 
 ## Requirements
 
-- Codex plugin support.
+- Agent Skills or a supported Codex, Claude Code, or Grok Build plugin loader.
 - A host tool that can reach the selected Grok Bot surface. The verified path uses a macOS CUA tool and an already signed-in Grok Bot app.
 - Explicit authorization for the target conversation and requested external effects.
 - A stable task directory for `coordination.json` when work spans turns or operators.
@@ -41,6 +41,10 @@ Current official references: [work](https://cursor.com/docs/grok-bot/work), [set
 Installing this plugin grants no Grok Bot access. The current host still controls app permissions, account access, scheduling, filesystem access, and external writes.
 
 ## Install
+
+The release keeps one canonical `skills/grok-bot-control` directory. Platform manifests make that skill discoverable but do not change its capabilities.
+
+### Codex
 
 Install the public repository marketplace:
 
@@ -53,9 +57,15 @@ For a downloaded marketplace ZIP, extract it and use its directory instead of th
 
 Start a new Codex thread after installation or update. Local developers should use Codex's plugin scaffold/cachebuster workflow instead of editing an installed cache.
 
+### Claude Code and Grok Build
+
+Install the repository through the host's supported plugin or marketplace command. Claude Code uses the Claude plugin manifest; Grok Build can use its native plugin discovery or Claude-compatible form. Inspect the installed skill and run its offline tests after installation. Current command syntax and trust prompts come from the host's documentation, not this workflow.
+
+For a host that implements Agent Skills without plugin marketplaces, install the self-contained `skills/grok-bot-control` directory in that host's documented skill location.
+
 ## Use
 
-Ask Codex to use `$grok-bot-control` and name the authorized Bot/conversation and desired result. Examples:
+Ask the current agent to use `$grok-bot-control` and name the authorized Bot/conversation and desired result. Examples:
 
 - “Use `$grok-bot-control` to send this reviewed handoff and verify that it appears once.”
 - “Check the latest reply, validate the returned archive and tests, then continue the same task.”
@@ -72,9 +82,16 @@ The offline helpers never operate the UI. Run them from the skill directory so t
 ```sh
 cd skills/grok-bot-control
 python3 scripts/assess_wait.py /path/to/task/coordination.json
+python3 scripts/assess_capabilities.py /path/to/task/capabilities.json \
+  --run-id "$RUN_ID" --operator current-agent \
+  --conversation "$CONVERSATION_ALIAS" --message-sha256 "$MESSAGE_SHA256"
 python3 scripts/assess_send.py /path/to/task/coordination.json \
-  --operator codex --message-sha256 "$MESSAGE_SHA256" --observation matching-draft-only
+  --operator current-agent --message-sha256 "$MESSAGE_SHA256" \
+  --observation matching-draft-only \
+  --capabilities /path/to/task/capabilities.json --run-id "$RUN_ID"
 ```
+
+Replace `current-agent` with the same non-secret operator label recorded in the task state. See [the capability contract](skills/grok-bot-control/references/host-adapters.md) for the current, intent-scoped preflight snapshot shape. A snapshot expires after five minutes and never grants authorization. The capability arguments remain optional for legacy use, which requires the equivalent current UI checks to be performed manually.
 
 ## Safety model
 
@@ -86,8 +103,8 @@ python3 scripts/assess_send.py /path/to/task/coordination.json \
 
 ## Platform and publishing limits
 
-The native CUA procedure was exercised on macOS. Other desktop platforms, browser variants, CLI auth methods, and schedulers require their own current tools and verification. Accessibility indices and UI layouts are dynamic.
+The native CUA procedure was exercised on macOS. Other agent hosts, desktop platforms, browser variants, CLI auth methods, and schedulers require their own current tools and verification. Accessibility indices and UI layouts are dynamic. The offline capability helper evaluates a supplied snapshot; it does not probe a host or prove its claims.
 
-This can be shared as a **Codex-hosted CUA coordination workflow**. It is not an official Grok API, a universal Grok controller, or a background resident service. Codex plugin format is separate from Cursor's plugin marketplace and review process; publishing here does not make it a Cursor marketplace plugin.
+This can be shared as a **portable coordination workflow with an exercised Codex/macOS CUA adapter**. It is not an official Grok API, a universal Grok controller, or a background resident service. Installation or marketplace acceptance on one host does not prove that another host has the required tools or that its live adapter works.
 
 See the skill references for exact readback rules, workflows, portability, and the third-party CLI audit.
