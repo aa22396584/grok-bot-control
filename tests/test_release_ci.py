@@ -74,7 +74,7 @@ class ArchiveTests(unittest.TestCase):
             BUILD_RELEASE.write_zip(target, {"root/nested/source.txt": source})
             with zipfile.ZipFile(target) as archive:
                 self.assertEqual(archive.namelist(), ["root/nested/source.txt"])
-                self.assertEqual(archive.read("root/nested/source.txt"), b"portable\n")
+                self.assertEqual(archive.read("root/nested/source.txt"), source.read_bytes())
 
     def test_write_zip_is_deterministic_for_identical_input(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
