@@ -129,3 +129,8 @@ footer { border-top: 1px solid var(--rule); padding: 34px 0 54px; color: var(--p
   .limits { grid-template-columns: 1fr; }
   .footer-grid { flex-direction: column; }
 }
+@media (max-width: 520px) {
+  .site-head { flex-direction: column; gap: 16px; }
+  .brand { white-space: nowrap; }
+  nav { justify-content: flex-start; }
+}
