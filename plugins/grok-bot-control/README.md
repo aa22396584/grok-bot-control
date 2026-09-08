@@ -2,7 +2,7 @@
 
 A portable Agent Skills workflow for reliable, reviewable coordination with a Grok Bot conversation. It captures a macOS computer-use procedure exercised in practice and supplies the same core rules to Codex, Claude Code, Grok Build, and compatible skill hosts: identify the exact conversation, preserve unrelated drafts, read back pasted text, send once, and reconcile timeouts before retrying.
 
-This plugin contains instructions and offline state helpers. It does not bundle Grok Bot, a computer-use driver, an MCP server, account credentials, or an unofficial API client.
+This plugin contains instructions, offline assessments, a local delivery journal, and an optional thin CLI adapter. It does not bundle Grok Bot, a computer-use driver, an MCP server, account credentials, or an unofficial API client.
 
 ## What it helps with
 
@@ -14,7 +14,7 @@ This plugin contains instructions and offline state helpers. It does not bundle 
 | Track progress and bounded nudges | Stable state file; optional host scheduler | Offline helper tested; scheduler is not included |
 | Edit routines or installed skills | Current UI/tool support and explicit task scope | Documented workflow; verify each saved result in the target UI |
 | Manage Bots, notification settings, taught tasks, connectors, or search/reply | Current Grok Bot UI/tool support and task-specific authorization | Documented workflow only; product actions are not implemented by this plugin |
-| Use `grok-bot-cli` | Separately reviewed third-party CLI and credential authorization | Bounded live list/read/send proof is version-bound; see the experimental reference |
+| Use `grok-bot-cli` | Exact pinned source, supported app version, and explicit live/send opt-ins | Optional adapter and synthetic fault tests; see [CLI adapter](skills/grok-bot-control/references/cli-adapter.md) for the current live proof boundary |
 
 ## Grok Bot product capabilities versus this plugin
 
@@ -96,7 +96,7 @@ Replace `current-agent` with the same non-secret operator label recorded in the 
 ## Safety model
 
 - One recorded operator writes to a conversation at a time. The state file detects mismatches but is not a distributed lock.
-- A timeout is reconciled against fresh UI state. Unknown send state blocks automatic retry.
+- CLI and UI send paths must share the same local delivery journal and task scope. Reserve before dispatch; fresh outgoing readback confirms delivery. An acknowledgement or an empty transcript tail does not authorize another send.
 - Target conversation, message digest, artifact digest, and evidence level remain distinct.
 - Destructive commands, purchases, deployments, credential access, and third-party messages require their own authorization.
 - No account IDs, conversation text, tokens, private paths, or credentials belong in the plugin.

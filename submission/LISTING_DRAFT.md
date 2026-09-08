@@ -11,7 +11,7 @@ Submission type: **Skills only**. No MCP server is included.
 
 ### Long description
 
-Grok Bot Control is a portable, skills-only workflow plugin for reliable coordination with an authorized Grok Bot conversation from Codex, Claude Code, or Grok Build. It guides host capability assessment, exact target verification, preservation of unrelated drafts, reconciliation of uncertain sends before retrying, versioned evidence exchange, and bounded progress nudges. When callers provide a capability snapshot and run identifier, the optional capability preflight binds fresh tool evidence to the current run, target, and intent digest. The three Python helpers are deterministic, read-only advisory tools; they do not enforce a host runtime gate.
+Grok Bot Control is a portable workflow plugin for authorized Grok Bot coordination from Codex, Claude Code, or Grok Build. It provides target and draft verification, uncertainty reconciliation, evidence handoffs, bounded follow-ups, three read-only assessment helpers, a local delivery journal, and an optional source-pinned CLI adapter. Live reads and sends require explicit opt-in and a separately installed compatible CLI with an authorized app session. The adapter keeps message text out of argv and never retries an ambiguous send or switches to UI to resend. The journal protects callers using the same local file and logical operation scope; it is not a distributed lock. Authentication and Gateway parsing stay in the independent CLI. No Grok Bot app, credentials, MCP server, computer-use backend, scheduler, or background service is bundled.
 
 The plugin does not include Grok Bot, credentials, an MCP server, a computer-use backend, a scheduler, or a background service.
 
@@ -32,7 +32,7 @@ All four URLs must be publicly reachable and match the selected verified publish
 
 ## Release notes
 
-Version 0.2.0 shares one portable skill across Codex, Claude Code, and Grok Build. It adds an optional host capability preflight that, when supplied, binds fresh evidence to the run, target, and intent digest; keeps the single-writer, duplicate-send reconciliation, evidence handoff, and bounded nudge workflow; and supplies three read-only advisory helpers with reviewer-runnable synthetic cases. Platform packaging and release automation are included. Live use requires host-provided control tools and an authorized Grok Bot conversation; neither is bundled.
+Version 0.3.0 adds an optional thin CLI adapter for Bot roster, normalized transcript reads, explicit stdin sends, and readback reconciliation. A shared SQLite delivery journal reserves before dispatch and blocks uncertain repeats across CLI and UI workflows. Source files and tested versions are pinned; CLI subprocess time and output are bounded. Offline fault tests cover stale and uncertain readback, concurrent reservation, crash persistence, input handling, and child termination. Live compatibility evidence is stated separately in the repository.
 
 ## Submission readiness gates
 

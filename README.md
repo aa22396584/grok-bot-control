@@ -17,7 +17,7 @@ Start a new Codex task, then ask:
 
 > Use $grok-bot-control to coordinate with my authorized Grok Bot conversation. Read the latest response, check the returned evidence, and continue the handoff.
 
-You need a host-provided computer-use tool and access to the target conversation. The native app procedure has been exercised on macOS. Installing this plugin does not grant account access or install a computer-use tool. The optional third-party CLI is separate and experimental.
+You need a host-provided computer-use tool or the [optional pinned CLI adapter](plugins/grok-bot-control/skills/grok-bot-control/references/cli-adapter.md), plus access to the target conversation. The native app procedure has been exercised on macOS. Installing this plugin does not grant account access or install either backend.
 
 For an offline install, extract the marketplace ZIP from [Releases](https://github.com/ImL1s/grok-bot-control/releases), add that extracted folder with `codex plugin marketplace add /path/to/grok-bot-control-marketplace`, then run the second install command above.
 
@@ -25,10 +25,11 @@ For an offline install, extract the marketplace ZIP from [Releases](https://gith
 
 - A reusable conversation workflow: target, draft, readback, send, acknowledgement, and artifact review.
 - Read-only Python helpers for host capability assessment, send-state decisions, and bounded follow-up timing.
+- An optional CLI adapter for Bot roster, normalized transcript reads, and explicit sends; a shared local delivery journal blocks repeat dispatch after uncertain outcomes across CLI and UI workflows.
 - Procedures for file handoffs, routines, skills, notifications, and other product surfaces, with their verification limits stated.
 - Offline tests and synthetic reviewer cases that do not contact Grok or any real account.
 
-There is no MCP server, bundled API client, background scheduler, push provider, or credential store. The operator record is advisory and is not a distributed lock. A timed-out send must be reconciled before retrying.
+There is no MCP server, bundled API client, background scheduler, push provider, or credential store. The external CLI owns authentication and protocol compatibility. The delivery journal is a local shared-file guard, not a distributed lock or exactly-once guarantee. A timed-out send must be reconciled; the adapter never automatically retries or switches to UI to send again.
 
 See the [plugin guide](plugins/grok-bot-control/README.md) for the capability matrix and [skill](plugins/grok-bot-control/skills/grok-bot-control/SKILL.md) for the full workflow.
 
@@ -53,7 +54,7 @@ grok plugin details grok-bot-control
 
 `--trust` trusts this reviewed plugin's files. Grok Build is the terminal agent; Grok Bot is the separate application this skill helps coordinate with. The native Grok catalog and Claude-compatible manifest point to the same skill directory. Use a current Grok Build version with plugin support.
 
-Other agents can install the skills-only ZIP using their own Agent Skills discovery mechanism. Python helpers require Python 3.10+ and the standard library. Plugin installation provides instructions and offline helpers; live coordination also requires a host-provided UI/browser tool or a separately configured CLI. See [compatibility and validation](docs/COMPATIBILITY.md) for tested versions and the difference between installation and live operation.
+Other agents can install the skills-only ZIP using their own Agent Skills discovery mechanism. Python helpers require Python 3.10+ and the standard library. Plugin installation provides instructions, offline helpers, and an optional CLI adapter; live coordination also requires a host-provided UI/browser tool or a separately configured CLI. See [compatibility and validation](docs/COMPATIBILITY.md) for tested versions and the difference between installation and live operation.
 
 ## Test locally
 

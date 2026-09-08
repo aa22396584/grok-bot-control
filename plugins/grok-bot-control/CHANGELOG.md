@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+- Add an optional adapter for an independently installed, source-pinned Grok Bot CLI: offline compatibility check, live Bot roster and normalized transcript reads, explicit stdin send, and reconciliation.
+- Reserve a shared local SQLite delivery record before dispatch; an uncertain result blocks a repeated CLI or journal-aware UI send. Confirm only new outgoing readback relative to the persisted baseline.
+- Keep authentication and Gateway parsing in the CLI fork; do not bundle it, install it silently, or fall back to another send path.
+- Bound child execution time and output, pass message text through stdin, remove credential and runtime-injection environment overrides, and redact child errors.
+- Add synthetic transport, crash, concurrency, stale-readback, and subprocess fault tests. Publish the precise platform and live-evidence limits.
+
 ## 0.2.0
 
 - Share one Agent Skill across Codex, Claude Code, and Grok Build with explicit host capability prerequisites.

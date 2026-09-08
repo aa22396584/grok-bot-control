@@ -24,3 +24,11 @@ On 2026-09-08, Claude Code 2.1.263 and Grok Build 1.0.13 passed their native plu
 - [Grok Build skills, plugins, and marketplaces](https://docs.x.ai/build/features/skills-plugins-marketplaces)
 
 The optional [grok-bot-cli fork](https://github.com/ImL1s/grok-bot-cli) is a separate project. Its authentication, backend compatibility, and live behavior are not established by this plugin's CI.
+
+## Optional CLI adapter in 0.3.0
+
+The adapter requires the exact source hashes and commit in [`cli-compatibility.json`](../plugins/grok-bot-control/skills/grok-bot-control/assets/cli-compatibility.json), a trusted absolute Node.js path (major 22), and the canonical `/Applications/Grok Bot.app` bundle (identifier and version 0.44.0). Live operations are gated to macOS. This verifies the installed bundle and reviewed source files, not the identity or version of a remote Gateway server.
+
+Only Bot roster, normalized transcript reads, explicit stdin sends, and readback reconciliation are exposed. Offline CI tests the decision and journal behavior on Linux, macOS, and Windows; subprocess fault tests run on POSIX. Windows and Linux live authentication are not validated. Direct CLI or UI operations that bypass the shared journal are outside its duplicate-send protection, and separate computers do not share a distributed lock. See the [adapter guide](../plugins/grok-bot-control/skills/grok-bot-control/references/cli-adapter.md) for setup and evidence limits.
+
+The [bounded adapter exercise](ADAPTER_EVIDENCE.md) records the live roster/read/send/UI readback separately from synthetic fault tests. Bot replies lacking an explicit API role remain `unknown`; use independent UI evidence when author attribution matters.

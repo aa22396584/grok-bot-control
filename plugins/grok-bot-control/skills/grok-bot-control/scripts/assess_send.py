@@ -118,9 +118,42 @@ def main() -> int:
     parser.add_argument("--capabilities", type=Path)
     parser.add_argument("--run-id")
     parser.add_argument("--now", help="timezone-aware ISO-8601 time; capability tests only")
+    parser.add_argument("--delivery-journal", type=Path)
+    parser.add_argument("--delivery-scope")
+    parser.add_argument("--delivery-target")
     args = parser.parse_args()
     try:
         state = require_state(json.loads(args.state.read_text(encoding="utf-8")))
+        journal_args = (args.delivery_journal, args.delivery_scope, args.delivery_target)
+        if any(value is not None for value in journal_args) and not all(
+            value is not None for value in journal_args
+        ):
+            raise InputError("delivery journal arguments must be provided together")
+        if args.delivery_journal is not None:
+            module_path = Path(__file__).with_name("delivery_state.py")
+            spec = importlib.util.spec_from_file_location("delivery_state", module_path)
+            if not spec or not spec.loader:
+                raise InputError("delivery journal helper could not be loaded")
+            delivery_state = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(delivery_state)
+            delivery = delivery_state.read_delivery(
+                args.delivery_journal,
+                args.delivery_scope,
+                args.delivery_target,
+                args.message_sha256,
+            )
+            if delivery["state"] == "confirmed":
+                print(json.dumps({
+                    "action": "stop",
+                    "reason": "delivery_journal:confirmed",
+                }, sort_keys=True))
+                return 0
+            if delivery["blocks_send"]:
+                print(json.dumps({
+                    "action": "inspect",
+                    "reason": "delivery_journal:" + delivery["reason"],
+                }, sort_keys=True))
+                return 0
         if (args.capabilities is None) != (args.run_id is None):
             raise InputError("--capabilities and --run-id must be provided together")
         if args.capabilities is not None:

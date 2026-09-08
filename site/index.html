@@ -25,7 +25,7 @@
       <div class="hero-copy">
         <div class="eyebrow">Community workflow plugin · MIT</div>
         <h1>Handoffs with a <em>paper trail.</em></h1>
-        <p class="lede">A shared skill for Codex, Claude Code, and Grok Build to coordinate work with Grok Bot through explicit ownership, bounded waits, evidence packages, and offline decision helpers.</p>
+        <p class="lede">A shared skill for Codex, Claude Code, and Grok Build to coordinate work with Grok Bot through explicit ownership, bounded waits, evidence packages, offline decision helpers, and an optional CLI adapter.</p>
         <p class="zh" lang="zh-Hant">把 Grok Bot 的交接、等待、催辦與驗收變成可檢查的流程。它協助你控制操作，不假裝自己是全天候自動化平台。</p>
         <div class="actions"><a class="button primary" href="#install">Install locally</a><a class="button" href="https://github.com/ImL1s/grok-bot-control">Read the source ↗</a></div>
       </div>
@@ -39,7 +39,7 @@
     <div class="band"><div class="wrap ticker"><span><b>●</b> Offline helpers</span><span>Single-writer discipline</span><span>Bounded nudges</span><span>Evidence-first review</span></div></div>
 
     <section id="capabilities"><div class="wrap section-grid">
-      <div><div class="eyebrow">What it adds</div><h2>A control layer for human-scale agent work.</h2><p class="section-intro">The plugin supplies instructions and local decision helpers. The host and signed-in Grok Bot environment still perform the actual work.</p></div>
+      <div><div class="eyebrow">What it adds</div><h2>A control layer for human-scale agent work.</h2><p class="section-intro">The plugin supplies instructions, local decision helpers, and a thin optional CLI adapter. Your signed-in Grok Bot environment performs the delegated work.</p></div>
       <div class="capabilities">
         <article class="cap"><span class="number">01 / HANDOFF</span><h3>Explicit ownership</h3><p>Identify the current operator and conversation before a message is sent.</p></article>
         <article class="cap"><span class="number">02 / SEND</span><h3>No blind repeats</h3><p>Classify draft, sent, acknowledged, and uncertain states to avoid duplicate prompts.</p></article>
@@ -72,7 +72,7 @@ grok plugin install grok-bot-control --trust</code></div>
       <div class="limits">
         <article class="limit"><div class="mark">×</div><h3>No bundled automation backend</h3><p>This project does not include a Grok Bot API client, authentication system, daemon, or hosted service.</p></article>
         <article class="limit"><div class="mark">×</div><h3>No reliability promise</h3><p>It does not promise 24-hour uptime, live UI parity across agents, exactly-once delivery, or unattended failover.</p></article>
-        <article class="limit"><div class="mark">→</div><h3>Optional CLI is separate</h3><p>A community CLI fork is maintained independently at ImL1s/grok-bot-cli. Review it as a separate component.</p></article>
+        <article class="limit"><div class="mark">→</div><h3>Optional CLI is separate</h3><p>The adapter verifies a pinned ImL1s/grok-bot-cli checkout before use. Authentication and protocol handling stay in that independent project; no automatic installation or resend.</p></article>
       </div>
     </div></section>
   </main>
