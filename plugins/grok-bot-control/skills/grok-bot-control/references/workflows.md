@@ -32,7 +32,7 @@ Prerequisite: a UI or API that exposes the selected Bot's routines. Read the exi
 
 Prerequisite: a supported plugin/skill management surface on the target host. Treat source files, copied package, installed files, enabled state, and successful invocation as separate stages. Preserve the existing installation before an update. After install or registration, read the actual installed files and compare the manifest/hashes; registration tools may rewrite content.
 
-An installed skill describes a workflow. It does not grant CUA, filesystem, scheduler, account, or network permissions. Grok Bot skills and Codex plugins use different installation and review paths.
+An installed skill describes a workflow. It does not grant CUA, filesystem, scheduler, account, or network permissions. Grok Bot product skills and agent-host plugins have separate installation and review paths; follow the destination host's current documentation.
 
 ## Bot groups and handoffs
 

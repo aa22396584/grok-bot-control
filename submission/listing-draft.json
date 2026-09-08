@@ -39,7 +39,7 @@
     "status": "pending publisher decision",
     "countries_or_regions": []
   },
-  "release_notes": "Initial skills-only submission. Adds a documented single-writer coordination workflow, duplicate-send reconciliation, evidence-based handoffs, bounded nudge guidance, two read-only offline helpers, and reviewer-runnable synthetic cases. Live use requires a host-provided computer-use surface and the reviewer's already signed-in Grok Bot account; neither is bundled.",
+  "release_notes": "Version 0.2.0 shares one portable skill across Codex, Claude Code, and Grok Build, adds host capability assessment, and provides tested platform packaging and automated releases. Offline helpers and synthetic cases require no live account. Live control still requires host-provided tools and an authorized Grok Bot conversation.",
   "policy_attestations": {
     "status": "not completed",
     "note": "The publisher must review and complete attestations in the portal after verifying the final listing, URLs, identity, package, tests, and availability."

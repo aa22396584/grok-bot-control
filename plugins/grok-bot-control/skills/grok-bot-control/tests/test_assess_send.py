@@ -21,6 +21,30 @@ SPEC.loader.exec_module(MODULE)
 DIGEST = "a" * 64
 
 
+def capability_snapshot(**changes):
+    value = {
+        "schema_version": 1,
+        "observed_at": "2026-09-08T01:58:00Z",
+        "run_id": "run-current",
+        "intent": {
+            "operator": "codex",
+            "conversation": "target-conversation",
+            "message_sha256": DIGEST,
+        },
+        "target_identity": {"confirmed": True, "evidence": "fresh_target_readback"},
+        "send_authorized": True,
+        "capabilities": {
+            "read_conversation": {"available": True, "evidence": "fresh_state_readback"},
+            "read_composer": {"available": True, "evidence": "fresh_state_readback"},
+            "write_composer": {"available": True, "evidence": "current_tool_docs"},
+            "activate_send": {"available": True, "evidence": "current_tool_docs"},
+            "read_sent_state": {"available": True, "evidence": "fresh_state_readback"},
+        },
+    }
+    value.update(changes)
+    return value
+
+
 def state(**changes):
     value = {
         "schema_version": 1,
@@ -140,6 +164,19 @@ class DecisionTests(unittest.TestCase):
 
 
 class CliTests(unittest.TestCase):
+    def bound_command(self, state_path, capability_path):
+        return [
+            sys.executable,
+            str(SCRIPT),
+            str(state_path),
+            "--operator", "codex",
+            "--message-sha256", DIGEST,
+            "--observation", "absent",
+            "--capabilities", str(capability_path),
+            "--run-id", "run-current",
+            "--now", "2026-09-08T02:00:00Z",
+        ]
+
     def test_cli_is_read_only(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "state.json"
@@ -164,6 +201,77 @@ class CliTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(json.loads(result.stdout)["action"], "paste_once")
             self.assertEqual(before, hashlib.sha256(path.read_bytes()).hexdigest())
+
+    def test_bound_capability_contract_allows_existing_send_decision(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = Path(tmp) / "state.json"
+            capability_path = Path(tmp) / "capabilities.json"
+            state_path.write_text(json.dumps(state()))
+            capability_path.write_text(json.dumps(capability_snapshot()))
+            result = subprocess.run(
+                self.bound_command(state_path, capability_path),
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(result.stdout)["action"], "paste_once")
+
+    def test_bound_contract_rejects_other_intent_digest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = Path(tmp) / "state.json"
+            capability_path = Path(tmp) / "capabilities.json"
+            payload = capability_snapshot()
+            payload["intent"]["message_sha256"] = "b" * 64
+            state_path.write_text(json.dumps(state()))
+            capability_path.write_text(json.dumps(payload))
+            result = subprocess.run(
+                self.bound_command(state_path, capability_path),
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(result.stdout)["action"], "inspect")
+            self.assertEqual(
+                json.loads(result.stdout)["reason"],
+                "capability_preflight:intent_mismatch",
+            )
+
+    def test_bound_contract_honors_revoked_authorization(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = Path(tmp) / "state.json"
+            capability_path = Path(tmp) / "capabilities.json"
+            state_path.write_text(json.dumps(state()))
+            capability_path.write_text(json.dumps(capability_snapshot(send_authorized=False)))
+            result = subprocess.run(
+                self.bound_command(state_path, capability_path),
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(result.stdout)["action"], "stop")
+            self.assertEqual(
+                json.loads(result.stdout)["reason"],
+                "capability_preflight:send_not_authorized",
+            )
+
+    def test_malformed_bound_snapshot_returns_structured_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = Path(tmp) / "state.json"
+            capability_path = Path(tmp) / "capabilities.json"
+            state_path.write_text(json.dumps(state()))
+            capability_path.write_text("[]")
+            result = subprocess.run(
+                self.bound_command(state_path, capability_path),
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 2)
+            self.assertEqual(json.loads(result.stdout)["error"]["code"], "invalid_input")
+            self.assertNotIn("Traceback", result.stderr)
 
 
 if __name__ == "__main__":

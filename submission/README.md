@@ -16,7 +16,7 @@ Build the upload candidate from the repository root:
 python3 scripts/build_release.py --output dist
 ```
 
-`grok-bot-control-0.1.0-skills.zip` contains one skill folder with `SKILL.md`, its referenced scripts, assets, references, tests, and MIT license. The separate `marketplace.zip` is for Codex repository-marketplace installation. Verify `SHA256SUMS` before choosing an artifact.
+`grok-bot-control-0.2.0-skills.zip` contains one skill folder with `SKILL.md`, its referenced scripts, assets, references, tests, and MIT license. The marketplace ZIP contains catalogs for Codex, Claude Code, and Grok Build; the plugin ZIP contains a self-contained plugin root for direct loading. Verify `SHA256SUMS` before choosing an artifact.
 
 ## Portal sequence
 
@@ -30,3 +30,11 @@ python3 scripts/build_release.py --output dist
 Local test results cover the offline helpers. Live Grok Bot operation requires host tools and an authorized, signed-in test environment; the package does not supply those or personal credentials. Reviewer acceptance of that live environment must be established during the official process.
 
 Source: [OpenAI's submission guide](https://developers.openai.com/plugins/deploy/submission). Portal requirements may change. Never label a prepared bundle, a pending identity review, or a submitted review as an officially published plugin.
+
+## Claude Code community marketplace
+
+Validate with `claude plugin validate ./plugins/grok-bot-control`, then use the [Console submission form](https://platform.claude.com/plugins/submit). Submit the source repository and select the plugin subdirectory where the form supports it, or use the tested plugin-root ZIP if the current form requests an upload. Authentication and any publisher declarations must be completed with the intended publishing account. The community directory is distinct from Anthropic’s curated official directory. [Official instructions](https://code.claude.com/docs/en/plugins#submit-your-plugin-to-the-community-marketplace).
+
+## Grok Build official marketplace
+
+Submit a PR to [xai-org/plugin-marketplace](https://github.com/xai-org/plugin-marketplace) with the release source pinned to its complete commit SHA. Regenerate the component index and run the upstream catalog validator. Confirm that its generator discovers this repository’s plugin subdirectory; a client supporting subdirectories does not prove that the catalog generator does. Retain the PR URL and review status as the receipt. A submitted PR is not an approved listing.

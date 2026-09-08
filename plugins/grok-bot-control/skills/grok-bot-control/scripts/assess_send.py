@@ -7,8 +7,10 @@ This helper is read-only. It never opens an app, edits state, or sends content.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -113,11 +115,39 @@ def main() -> int:
     parser.add_argument("--operator", required=True)
     parser.add_argument("--message-sha256", required=True)
     parser.add_argument("--observation", choices=sorted(OBSERVATIONS), required=True)
+    parser.add_argument("--capabilities", type=Path)
+    parser.add_argument("--run-id")
+    parser.add_argument("--now", help="timezone-aware ISO-8601 time; capability tests only")
     args = parser.parse_args()
     try:
         state = require_state(json.loads(args.state.read_text()))
+        if (args.capabilities is None) != (args.run_id is None):
+            raise InputError("--capabilities and --run-id must be provided together")
+        if args.capabilities is not None:
+            module_path = Path(__file__).with_name("assess_capabilities.py")
+            spec = importlib.util.spec_from_file_location("assess_capabilities", module_path)
+            if not spec or not spec.loader:
+                raise InputError("capability helper could not be loaded")
+            capabilities = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(capabilities)
+            now = capabilities.parse_time(args.now, "now") if args.now else datetime.now(timezone.utc)
+            preflight = capabilities.decide(
+                capabilities.require_snapshot(json.loads(args.capabilities.read_text())),
+                now=now,
+                run_id=args.run_id,
+                operator=args.operator,
+                conversation=state["conversation"] or "",
+                message_sha256=args.message_sha256,
+            )
+            if preflight["action"] != "ready_for_send_gate":
+                action = "stop" if preflight["reason"] == "send_not_authorized" else "inspect"
+                print(json.dumps({
+                    "action": action,
+                    "reason": "capability_preflight:" + preflight["reason"],
+                }, sort_keys=True))
+                return 0
         result = decide(state, args.operator, args.message_sha256, args.observation)
-    except (InputError, json.JSONDecodeError, OSError) as exc:
+    except (InputError, json.JSONDecodeError, OSError, ValueError) as exc:
         print(json.dumps({"error": {"code": "invalid_input", "message": str(exc)}}))
         return 2
     print(json.dumps(result, sort_keys=True))

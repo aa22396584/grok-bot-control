@@ -1,6 +1,6 @@
 # Verified macOS CUA workflow
 
-Observed with the native Grok Bot macOS application on 2026-09-08. Product UI and tool APIs can change; the documentation returned by the current CUA tool takes priority.
+Observed with the native Grok Bot macOS application on 2026-09-08. This is a platform adapter for the shared [host capability contract](host-adapters.md), not a bundled driver. Product UI and tool APIs can change; the documentation returned by the current CUA tool takes priority.
 
 ## Initialize and identify the target
 

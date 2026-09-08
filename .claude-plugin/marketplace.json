@@ -1,0 +1,16 @@
+{
+  "name": "grok-bot-control-local",
+  "description": "Portable Grok Bot coordination skills and offline decision helpers.",
+  "owner": {
+    "name": "ImL1s"
+  },
+  "plugins": [
+    {
+      "name": "grok-bot-control",
+      "version": "0.2.0",
+      "description": "Coordinate authorized Grok Bot conversations with portable skills, capability checks, and verified handoffs.",
+      "source": "./plugins/grok-bot-control",
+      "category": "productivity"
+    }
+  ]
+}

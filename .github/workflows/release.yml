@@ -1,0 +1,67 @@
+name: Publish release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Verify exact tag commit
+    uses: ./.github/workflows/checks.yml
+
+  release:
+    name: Publish immutable GitHub release
+    needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Verify tag, commit, and release version
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          git fetch --no-tags origin main:refs/remotes/origin/main
+          git merge-base --is-ancestor "$EXPECTED_SHA" refs/remotes/origin/main
+          version="${RELEASE_TAG#v}"
+          test "v${version}" = "$RELEASE_TAG"
+          python scripts/sync_metadata.py --check
+          python scripts/validate_release.py --expected-version "$version"
+      - name: Build release archives
+        run: python scripts/build_release.py --output dist
+      - name: Refuse to overwrite an existing release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Release $RELEASE_TAG already exists; refusing to overwrite it." >&2
+            exit 1
+          fi
+      - name: Publish release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$RELEASE_TAG" \
+            dist/*.zip \
+            dist/SHA256SUMS \
+            dist/PACKAGE_VERIFICATION.json \
+            --verify-tag \
+            --title "Grok Bot Control ${RELEASE_TAG}" \
+            --generate-notes
