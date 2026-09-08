@@ -147,6 +147,15 @@ class CliTests(unittest.TestCase):
             self.assertEqual(json.loads(result.stdout)["error"]["code"], "invalid_input")
             self.assertNotIn("Traceback", result.stderr)
 
+    def test_invalid_utf8_exits_two_without_traceback(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "capabilities.json"
+            path.write_bytes(b"\xff")
+            result = subprocess.run(self.command(path), capture_output=True, text=True, check=False)
+            self.assertEqual(result.returncode, 2)
+            self.assertEqual(json.loads(result.stdout)["error"]["code"], "invalid_input")
+            self.assertNotIn("Traceback", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

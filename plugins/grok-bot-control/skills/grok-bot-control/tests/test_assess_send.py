@@ -164,12 +164,12 @@ class DecisionTests(unittest.TestCase):
 
 
 class CliTests(unittest.TestCase):
-    def bound_command(self, state_path, capability_path):
+    def bound_command(self, state_path, capability_path, operator="codex"):
         return [
             sys.executable,
             str(SCRIPT),
             str(state_path),
-            "--operator", "codex",
+            "--operator", operator,
             "--message-sha256", DIGEST,
             "--observation", "absent",
             "--capabilities", str(capability_path),
@@ -210,6 +210,35 @@ class CliTests(unittest.TestCase):
             capability_path.write_text(json.dumps(capability_snapshot()))
             result = subprocess.run(
                 self.bound_command(state_path, capability_path),
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(result.stdout)["action"], "paste_once")
+
+    def test_bound_contract_reads_utf8_non_ascii_scope(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = Path(tmp) / "state.json"
+            capability_path = Path(tmp) / "capabilities.json"
+            operator = "協作員"
+            conversation = "工作對話"
+            payload = capability_snapshot(intent={
+                "operator": operator,
+                "conversation": conversation,
+                "message_sha256": DIGEST,
+            })
+            state_path.write_bytes(
+                json.dumps(
+                    state(operator=operator, conversation=conversation),
+                    ensure_ascii=False,
+                ).encode("utf-8")
+            )
+            capability_path.write_bytes(
+                json.dumps(payload, ensure_ascii=False).encode("utf-8")
+            )
+            result = subprocess.run(
+                self.bound_command(state_path, capability_path, operator=operator),
                 capture_output=True,
                 text=True,
                 check=False,
@@ -263,6 +292,22 @@ class CliTests(unittest.TestCase):
             capability_path = Path(tmp) / "capabilities.json"
             state_path.write_text(json.dumps(state()))
             capability_path.write_text("[]")
+            result = subprocess.run(
+                self.bound_command(state_path, capability_path),
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 2)
+            self.assertEqual(json.loads(result.stdout)["error"]["code"], "invalid_input")
+            self.assertNotIn("Traceback", result.stderr)
+
+    def test_invalid_utf8_state_returns_structured_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = Path(tmp) / "state.json"
+            capability_path = Path(tmp) / "capabilities.json"
+            state_path.write_bytes(b"\xff")
+            capability_path.write_text(json.dumps(capability_snapshot()), encoding="utf-8")
             result = subprocess.run(
                 self.bound_command(state_path, capability_path),
                 capture_output=True,

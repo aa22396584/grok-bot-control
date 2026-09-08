@@ -141,8 +141,10 @@ def main() -> int:
     try:
         now = parse_time(args.now, "now") if args.now else datetime.now(timezone.utc)
         assert now is not None
-        result = decide(require_schema(json.loads(args.state.read_text())), now)
-    except (InputError, json.JSONDecodeError, OSError) as exc:
+        result = decide(
+            require_schema(json.loads(args.state.read_text(encoding="utf-8"))), now
+        )
+    except (InputError, json.JSONDecodeError, UnicodeDecodeError, OSError) as exc:
         print(json.dumps({"error": {"code": "invalid_input", "message": str(exc)}}))
         return 2
     print(json.dumps(result, sort_keys=True))

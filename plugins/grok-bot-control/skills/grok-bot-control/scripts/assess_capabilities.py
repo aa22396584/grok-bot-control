@@ -195,14 +195,14 @@ def main() -> int:
     try:
         now = parse_time(args.now, "now") if args.now else datetime.now(timezone.utc)
         result = decide(
-            require_snapshot(json.loads(args.snapshot.read_text())),
+            require_snapshot(json.loads(args.snapshot.read_text(encoding="utf-8"))),
             now=now,
             run_id=args.run_id,
             operator=args.operator,
             conversation=args.conversation,
             message_sha256=args.message_sha256,
         )
-    except (InputError, json.JSONDecodeError, OSError) as exc:
+    except (InputError, json.JSONDecodeError, UnicodeDecodeError, OSError) as exc:
         print(json.dumps({"error": {"code": "invalid_input", "message": str(exc)}}))
         return 2
     print(json.dumps(result, sort_keys=True))

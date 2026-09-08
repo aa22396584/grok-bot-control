@@ -120,7 +120,7 @@ def main() -> int:
     parser.add_argument("--now", help="timezone-aware ISO-8601 time; capability tests only")
     args = parser.parse_args()
     try:
-        state = require_state(json.loads(args.state.read_text()))
+        state = require_state(json.loads(args.state.read_text(encoding="utf-8")))
         if (args.capabilities is None) != (args.run_id is None):
             raise InputError("--capabilities and --run-id must be provided together")
         if args.capabilities is not None:
@@ -132,7 +132,9 @@ def main() -> int:
             spec.loader.exec_module(capabilities)
             now = capabilities.parse_time(args.now, "now") if args.now else datetime.now(timezone.utc)
             preflight = capabilities.decide(
-                capabilities.require_snapshot(json.loads(args.capabilities.read_text())),
+                capabilities.require_snapshot(
+                    json.loads(args.capabilities.read_text(encoding="utf-8"))
+                ),
                 now=now,
                 run_id=args.run_id,
                 operator=args.operator,
@@ -147,6 +149,9 @@ def main() -> int:
                 }, sort_keys=True))
                 return 0
         result = decide(state, args.operator, args.message_sha256, args.observation)
+    except UnicodeDecodeError as exc:
+        print(json.dumps({"error": {"code": "invalid_input", "message": str(exc)}}))
+        return 2
     except (InputError, json.JSONDecodeError, OSError, ValueError) as exc:
         print(json.dumps({"error": {"code": "invalid_input", "message": str(exc)}}))
         return 2
