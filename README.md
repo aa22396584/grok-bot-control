@@ -1,5 +1,10 @@
 # Grok Bot Control
 
+> **Development home:** https://github.com/ImL1s/grok-bot-control  
+> Please open issues and pull requests there.  
+> **Mirrors:** [Codeberg](https://codeberg.org/ImL1s/grok-bot-control) · [GitLab](https://gitlab.com/aa22396584/grok-bot-control)
+
+
 **Reviewable Grok Bot handoffs for Codex, Claude Code, and Grok Build.** One shared Agent Skill identifies the right conversation, preserves drafts, reconciles uncertain sends, and verifies the work that comes back.
 
 [Website](https://iml1s.github.io/grok-bot-control/) · [Releases](https://github.com/ImL1s/grok-bot-control/releases) · [Support](https://iml1s.github.io/grok-bot-control/support/) · [MIT license](LICENSE)
