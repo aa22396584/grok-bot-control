@@ -8,7 +8,7 @@ Security-sensitive behavior includes target selection, draft preservation, dupli
 
 ## Reporting
 
-Use [GitHub private vulnerability reporting](https://github.com/ImL1s/grok-bot-control/security/advisories/new) for a suspected vulnerability. Include the plugin version, affected file, minimal reproduction, and expected versus observed behavior. Do not include access tokens, gateway descriptors, routing headers, Keychain output, passwords, one-time codes, private transcripts, account identifiers, or real customer data.
+Use [GitHub private vulnerability reporting](https://github.com/aa22396584/grok-bot-control/security/advisories/new) for a suspected vulnerability. Include the plugin version, affected file, minimal reproduction, and expected versus observed behavior. Do not include access tokens, gateway descriptors, routing headers, Keychain output, passwords, one-time codes, private transcripts, account identifiers, or real customer data.
 
 If no private maintainer channel is available, open a public issue containing only a redacted description and ask for a private reporting route.
 

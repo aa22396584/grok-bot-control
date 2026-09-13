@@ -1,13 +1,16 @@
 # Grok Bot Control
 
-> **Development home:** https://github.com/ImL1s/grok-bot-control  
-> Please open issues and pull requests there.  
-> **Mirrors:** [Codeberg](https://codeberg.org/ImL1s/grok-bot-control) · [GitLab](https://gitlab.com/aa22396584/grok-bot-control)
+**Development, Issues & Pull Requests:**  
+https://github.com/aa22396584/grok-bot-control
+
+**Mirrors:**  
+[GitLab](https://gitlab.com/aa22396584/grok-bot-control) ·
+[Codeberg](https://codeberg.org/ImL1s/grok-bot-control)
 
 
 **Reviewable Grok Bot handoffs for Codex, Claude Code, and Grok Build.** One shared Agent Skill identifies the right conversation, preserves drafts, reconciles uncertain sends, and verifies the work that comes back.
 
-[Website](https://iml1s.github.io/grok-bot-control/) · [Releases](https://github.com/ImL1s/grok-bot-control/releases) · [Support](https://iml1s.github.io/grok-bot-control/support/) · [MIT license](LICENSE)
+[Website](https://iml1s.github.io/grok-bot-control/) · [Releases](https://github.com/aa22396584/grok-bot-control/releases) · [Support](https://iml1s.github.io/grok-bot-control/support/) · [MIT license](LICENSE)
 
 This is an independent community plugin by [ImL1s](https://github.com/ImL1s). It is not affiliated with or endorsed by OpenAI, Cursor, or xAI. Public availability here does not mean approval or listing in an official plugin directory.
 
@@ -24,7 +27,7 @@ Start a new Codex task, then ask:
 
 You need a host-provided computer-use tool or the [optional pinned CLI adapter](plugins/grok-bot-control/skills/grok-bot-control/references/cli-adapter.md), plus access to the target conversation. The native app procedure has been exercised on macOS. Installing this plugin does not grant account access or install either backend.
 
-For an offline install, extract the marketplace ZIP from [Releases](https://github.com/ImL1s/grok-bot-control/releases), add that extracted folder with `codex plugin marketplace add /path/to/grok-bot-control-marketplace`, then run the second install command above.
+For an offline install, extract the marketplace ZIP from [Releases](https://github.com/aa22396584/grok-bot-control/releases), add that extracted folder with `codex plugin marketplace add /path/to/grok-bot-control-marketplace`, then run the second install command above.
 
 ## What is included
 
