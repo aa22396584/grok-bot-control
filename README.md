@@ -1,3 +1,5 @@
+> **This repository has moved.** Development continues at https://github.com/aa22396584/grok-bot-control (mirrors: GitLab · Codeberg).
+
 # Grok Bot Control
 
 **Development, Issues & Pull Requests:**  
